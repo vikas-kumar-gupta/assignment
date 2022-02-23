@@ -20,6 +20,22 @@ let getFibonacci = function (num, previous1, previous2) {
   }
 };
 
+let missingNum = function (arr) {
+    const n = arr.length + 1;
+    const formula = (n * (n + 1)) / 2;
+    let count = 0;
+    for(let i = 0; i < arr.length; i++) {
+        count += arr[i];
+    }
+    let result = formula - count;
+    return result;
+}
+
+module.exports.missingNum = (req, res) => {
+    const data = req.body;
+    res.send({"missingNum" : missingNum(req.body.arr)});
+} 
+
 module.exports.fibonacci = (req, res) => {
   let term = req.body.term;
   let pre1 = 1;
