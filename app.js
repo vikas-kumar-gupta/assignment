@@ -8,7 +8,8 @@ const testRoute = require('./routes/test');
 
 const app = express();
 
-const port = 3000;
+const port = process.argv[2];
+// const port = 3000;
 
 
 
