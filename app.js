@@ -65,10 +65,11 @@ app.listen(port, (req, res)=> {
   4. water-level                            Done
   5. missing number                         Done
   6. sort string                            Done
-  7. Power                                  Pending
+  7. Power                                  ---Pending
   8. Sessions                               Done
-  9. Cookies
-  11. Implement fs
-  10. Strore user data in a file
+  9. Cookies                                ---Pending
+  11. Implement fs                          Done
+  10. Strore user data in a file            Done
+  11. CRUD operations using mysql           ---Pending
 
 */
