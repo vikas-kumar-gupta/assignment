@@ -7,6 +7,7 @@ const problemRoute = require("./routes/problems");
 const userRoute = require("./routes/users");
 const DBRoute = require("./routes/db");
 const { get } = require("express/lib/response");
+const { resourceUsage } = require("process");
 
 const app = express();
 const port = process.argv[2];
@@ -43,6 +44,29 @@ app.get("/db-get", async (req, res) => {
   });
 });
 
+app.get('/user-listing', async (req, res) => {
+  connection.query(`select * from user join user_detail where user.id = user_detail.user_id`, (err, data, fields) => {
+    if(err) throw err;
+    res.send(data);
+  })
+})
+
+app.get('/:id/all-details', async (req, res) => {
+  let id = req.params.id;
+  let userData, userDetailsData;
+  connection.query(`SELECT * FROM user WHERE id = ${id}`, (err, data, fields) => {
+    if(err) throw err;
+    userData = data[0];
+    // console.log(userData);
+    connection.query(`SELECT * FROM user_detail WHERE user_id = ${id}`, (err, data, fields) => {
+      if(err) throw err;
+      userDetailsData = data[0];
+      // console.log(userDetailsData);
+      res.send(`username: ${userData.username}\n password: ${userData.password}\n firstName: ${userDetailsData.firstName} \n lastName: ${userDetailsData.lastName} \n phonenum: ${userDetailsData.phoneNum} `)
+    })
+  })
+})
+
 app.post("/sign-up", async (req, res) => {
   let { username, password, firstName, lastName, phoneNum } = req.body;
   connection.query(
@@ -77,9 +101,25 @@ app.post('/log-in', async (req, res) => {
     let id = data[0].id;
     connection.query(`SELECT firstName, lastName, phoneNum
     FROM user_detail WHERE user_id = ${id}`, (err, data, field) => {
-      res.send(data)
+      if(id) {
+        res.send(data)
+      } else {
+        res.send('di')
+      }
     })
   });
+})
+
+app.delete('/:id/delete-user', async (req, res) => {
+  let id = req.params.id;
+  connection.query(`DELETE FROM user_detail
+    WHERE user_id= ${id}`, (err, data, field) => {
+      if(err) throw err;
+      connection.query(`DELETE FROM user WHERE id= ${id}`, (err, data, fields) => {
+        if(err) throw err;
+        res.send(`data deleted for id: ${id}`);
+      })
+    })
 })
 
 app.get("/", (req, res) => {
@@ -115,4 +155,10 @@ app.listen(port, (req, res) => {
   14. User and user dec tables              ---Pending
   15. Triggers
   16. Hooks
+  17. post||signup                         Done
+  18. post||log-in                         Done
+  19. get||user-listing                    Done
+  20. get||all-details                     Done
+  21. delete||delete-user
+  22. put||update-user
 */
