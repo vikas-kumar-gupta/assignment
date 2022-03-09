@@ -13,8 +13,6 @@ const app = express();
 const port = process.argv[2];
 // const port = 3000;
 
-let newid;
-
 let connection = mysql.createConnection({
   host: "localhost",
   user: "admin",
@@ -44,28 +42,39 @@ app.get("/db-get", async (req, res) => {
   });
 });
 
-app.get('/user-listing', async (req, res) => {
-  connection.query(`select * from user join user_detail where user.id = user_detail.user_id`, (err, data, fields) => {
-    if(err) throw err;
-    res.send(data);
-  })
-})
+app.get("/user-listing", async (req, res) => {
+  connection.query(
+    `select * from user join user_detail where user.id = user_detail.user_id`,
+    (err, data, fields) => {
+      if (err) throw err;
+      res.send(data);
+    }
+  );
+});
 
-app.get('/:id/all-details', async (req, res) => {
+app.get("/:id/all-details", async (req, res) => {
   let id = req.params.id;
   let userData, userDetailsData;
-  connection.query(`SELECT * FROM user WHERE id = ${id}`, (err, data, fields) => {
-    if(err) throw err;
-    userData = data[0];
-    // console.log(userData);
-    connection.query(`SELECT * FROM user_detail WHERE user_id = ${id}`, (err, data, fields) => {
-      if(err) throw err;
-      userDetailsData = data[0];
-      // console.log(userDetailsData);
-      res.send(`username: ${userData.username}\n password: ${userData.password}\n firstName: ${userDetailsData.firstName} \n lastName: ${userDetailsData.lastName} \n phonenum: ${userDetailsData.phoneNum} `)
-    })
-  })
-})
+  connection.query(
+    `SELECT * FROM user WHERE id = ${id}`,
+    (err, data, fields) => {
+      if (err) throw err;
+      userData = data[0];
+      // console.log(userData);
+      connection.query(
+        `SELECT * FROM user_detail WHERE user_id = ${id}`,
+        (err, data, fields) => {
+          if (err) throw err;
+          userDetailsData = data[0];
+          // console.log(userDetailsData);
+          res.send(
+            `username: ${userData.username}\n password: ${userData.password}\n firstName: ${userDetailsData.firstName} \n lastName: ${userDetailsData.lastName} \n phonenum: ${userDetailsData.phoneNum} `
+          );
+        }
+      );
+    }
+  );
+});
 
 app.post("/sign-up", async (req, res) => {
   let { username, password, firstName, lastName, phoneNum } = req.body;
@@ -76,6 +85,7 @@ app.post("/sign-up", async (req, res) => {
       connection.query(
         `select id from user order by id desc limit 0,1`,
         (err, data, fields) => {
+          let newid;
           if (err) throw err;
           newid = data[0].id;
           connection.query(
@@ -93,34 +103,46 @@ app.post("/sign-up", async (req, res) => {
   );
 });
 
-app.post('/log-in', async (req, res) => {
-  let {username, password} = req.body;
-  connection.query(`SELECT id, username, password
-  FROM user WHERE username = '${username}' && password = '${password}'`, (err, data, field) => {
-    if(err) throw err;
-    let id = data[0].id;
-    connection.query(`SELECT firstName, lastName, phoneNum
-    FROM user_detail WHERE user_id = ${id}`, (err, data, field) => {
-      if(id) {
-        res.send(data)
-      } else {
-        res.send('di')
-      }
-    })
-  });
-})
+app.post("/log-in", async (req, res) => {
+  let { username, password } = req.body;
+  connection.query(
+    `SELECT id, username, password
+  FROM user WHERE username = '${username}' && password = '${password}'`,
+    (err, data, field) => {
+      if (err) throw err;
+      let id = data[0].id;
+      connection.query(
+        `SELECT firstName, lastName, phoneNum
+    FROM user_detail WHERE user_id = ${id}`,
+        (err, data, field) => {
+          if (id) {
+            res.send(data);
+          } else {
+            res.send("di");
+          }
+        }
+      );
+    }
+  );
+});
 
-app.delete('/:id/delete-user', async (req, res) => {
+app.delete("/:id/delete-user", async (req, res) => {
   let id = req.params.id;
-  connection.query(`DELETE FROM user_detail
-    WHERE user_id= ${id}`, (err, data, field) => {
-      if(err) throw err;
-      connection.query(`DELETE FROM user WHERE id= ${id}`, (err, data, fields) => {
-        if(err) throw err;
-        res.send(`data deleted for id: ${id}`);
-      })
-    })
-})
+  connection.query(
+    `DELETE FROM user_detail
+    WHERE user_id= ${id}`,
+    (err, data, field) => {
+      if (err) throw err;
+      connection.query(
+        `DELETE FROM user WHERE id= ${id}`,
+        (err, data, fields) => {
+          if (err) throw err;
+          res.send(`data deleted for id: ${id}`);
+        }
+      );
+    }
+  );
+});
 
 app.get("/", (req, res) => {
   res.send("welcome to home page");
@@ -152,13 +174,15 @@ app.listen(port, (req, res) => {
   11. CRUD operations using mysql           ---Pending
   12. install mariadb                       ---Pending
   13. install sequelize dependency          ---Pending
-  14. User and user dec tables              ---Pending
+  14. User and user dec tables              Done
   15. Triggers
   16. Hooks
   17. post||signup                         Done
   18. post||log-in                         Done
   19. get||user-listing                    Done
   20. get||all-details                     Done
-  21. delete||delete-user
+  21. delete||delete-user                  Done
   22. put||update-user
+  pgsql
+  
 */
